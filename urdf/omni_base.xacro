@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="PI" value="3.14159265359"/>
+  <xacro:property name="wheel_radius" value="0.054"/>  <!-- 54mm radius = 108mm diameter -->
+  <xacro:property name="wheel_width" value="0.045"/>   <!-- 45mm thickness -->
+  <xacro:property name="wheel_offset" value="0.01011" /> <!-- 10.11mm offset from base plate -->
+
+  <xacro:property name="base_height" value="0.030"/>   <!-- Height of base above wheels -->
+  <xacro:property name="base_radius" value="0.108"/>   <!-- 108mm base radius -->
+  <xacro:property name="base_thickness" value="0.007"/> <!-- Estimated base thickness -->
+
+  <xacro:property name="drive_motor_mount_height" value="0.0455"/>
+  <xacro:property name="drive_motor_mount_width" value="0.0475"/>
+  <xacro:property name="drive_motor_mount_depth" value="0.0348"/>
+
+  <xacro:macro name="drive_motor_mount" params="angle">
+    <!-- Calculate position -->
+    <xacro:property name="x_pos" value="${(base_radius - drive_motor_mount_depth) * cos(angle)}"/>
+    <xacro:property name="y_pos" value="${(base_radius - drive_motor_mount_depth) * sin(angle)}"/>
+    <xacro:property name="z_pos" value="${base_thickness}"/>
+
+    <visual>
+      <origin xyz="${x_pos} ${y_pos} ${z_pos}" rpy="${PI/2} 0 ${angle}"/>
+      <geometry>
+        <mesh filename="package://lekiwi_description/meshes/drive_motor_mount_v2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="navy_blue"/>
+    </visual>
+  </xacro:macro>
+
+  <!-- Base link - center of the robot -->
+  <link name="base_link">
+    <!-- Bottom Plate -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${-PI/2}"/>
+      <geometry>
+        <mesh filename="package://lekiwi_description/meshes/base_plate_layer1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="navy_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${-base_thickness/2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${base_radius}" length="${base_thickness}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 ${-base_thickness/2}" rpy="0 0 0"/>
+      <mass value="2.0"/>
+      <inertia ixx="0.0226" ixy="0.0" ixz="0.0"
+               iyy="0.0226" iyz="0.0"
+               izz="0.0450"/>
+    </inertial>
+
+    <!-- <xacro:drive_motor_mount angle="${PI/3}"/>
+    <xacro:drive_motor_mount angle="${PI}"/>
+    <xacro:drive_motor_mount angle="${-PI/3}"/> -->
+  </link>
+
+  <!-- Upper plate link -->
+  <link name="upper_plate_link">
+    <!-- Upper Plate -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 ${-PI/2}"/>
+      <geometry>
+        <mesh filename="package://lekiwi_description/meshes/base_plate_layer2.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="navy_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${-base_thickness/2}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${base_radius}" length="${base_thickness}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 ${-base_thickness/2}" rpy="0 0 0"/>
+      <mass value="2.0"/>
+      <inertia ixx="0.0226" ixy="0.0" ixz="0.0"
+               iyy="0.0226" iyz="0.0"
+               izz="0.0450"/>
+    </inertial>
+  </link>
+
+  <joint name="upper_plate_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="upper_plate_link"/>
+    <origin xyz="0 0 ${drive_motor_mount_height}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Base footprint (for navigation) -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 ${wheel_radius - (base_thickness + wheel_offset)}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Macro for omni wheel -->
+  <xacro:macro name="omni_wheel" params="prefix angle servo_id">
+    <!-- Calculate position -->
+    <xacro:property name="x_pos" value="${(base_radius + wheel_width/2) * cos(angle)}"/>
+    <xacro:property name="y_pos" value="${(base_radius + wheel_width/2) * sin(angle)}"/>
+    <xacro:property name="z_pos" value="${base_thickness + wheel_offset}"/>
+
+    <!-- Wheel link -->
+    <link name="${prefix}_wheel_link">
+      <!-- Main wheel mesh (Z-axis needs to become Y-axis for wheel rotation) -->
+      <!-- Additional 180° rotation needed because mesh points toward -Y instead of +Y -->
+      <!-- Scale from millimeters to meters -->
+      <visual name="${prefix}_wheel_body">
+        <origin xyz="0 ${-wheel_width/2} 0" rpy="${-PI/2} 0 0"/>
+        <geometry>
+          <mesh filename="package://lekiwi_description/meshes/custom_omni_wheel_carrier.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+
+      <!-- Collision (simplified - just use main cylinder for physics) -->
+      <collision>
+        <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+
+      <!-- Inertial properties -->
+      <inertial>
+        <origin xyz="0 0 0" rpy="${-PI/2} 0 0"/>
+        <mass value="0.2"/>
+        <inertia ixx="0.000162" ixy="0.0" ixz="0.0"
+                 iyy="0.000162" iyz="0.0"
+                 izz="0.000292"/>
+      </inertial>
+    </link>
+
+    <!-- Wheel joint - continuous rotation -->
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${prefix}_wheel_link"/>
+
+      <!-- Add PI/2 to angle so wheel +X points in rolling direction (tangent), not radial -->
+      <origin xyz="${x_pos} ${y_pos} ${z_pos}" rpy="0 0 ${angle - PI/2}"/>
+      <axis xyz="0 1 0"/>  <!-- Rotation around local Y axis (perpendicular to wheel) -->
+      <limit effort="10.0" velocity="10.0"/>
+      <dynamics damping="0.1" friction="0.1"/>
+    </joint>
+
+  </xacro:macro>
+
+  <!-- Instantiate the three omni wheels -->
+  <!-- Left wheel: 60 degrees from +X axis -->
+  <xacro:omni_wheel prefix="left" angle="${PI/3}" servo_id="7"/>
+
+  <!-- Rear wheel: 180 degrees from +X (pointing toward -X) -->
+  <xacro:omni_wheel prefix="rear" angle="${PI}" servo_id="8"/>
+
+  <!-- Right wheel: -60 degrees from +X axis -->
+  <xacro:omni_wheel prefix="right" angle="${-PI/3}" servo_id="9"/>
+
+</robot>
