@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="lekiwi_base">
+
+  <!-- Standalone LeKiwi base (no arm) -->
+  <xacro:arg name="port" default="/dev/ttyACM0"/>
+  <xacro:arg name="use_mock_hardware" default="false"/>
+
+  <xacro:include filename="$(find lekiwi_description)/urdf/lekiwi_base.xacro" />
+  <xacro:include filename="$(find lekiwi_description)/urdf/lekiwi_base.ros2_control.xacro" />
+
+  <xacro:lekiwi_base/>
+
+  <xacro:lekiwi_base_ros2_control port="$(arg port)" use_mock_hardware="$(arg use_mock_hardware)"/>
+
+</robot>

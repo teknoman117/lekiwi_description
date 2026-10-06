@@ -1,7 +1,6 @@
 import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
-from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration
 from launch_ros.actions import Node
@@ -14,11 +13,13 @@ def generate_launch_description():
     pkg_lekiwi_description = get_package_share_directory('lekiwi_description')
 
     # Paths to files
-    urdf_file = os.path.join(pkg_lekiwi_description, 'urdf', 'lekiwi.urdf.xacro')
+    urdf_file = os.path.join(pkg_lekiwi_description, 'urdf', 'lekiwi_base.urdf.xacro')
     controller_config = os.path.join(pkg_lekiwi_description, 'config', 'omni_controllers.yaml')
 
     # Launch arguments
     use_sim_time = LaunchConfiguration('use_sim_time')
+    port = LaunchConfiguration('port')
+    use_mock_hardware = LaunchConfiguration('use_mock_hardware')
 
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
@@ -26,11 +27,25 @@ def generate_launch_description():
         description='Use simulation (Gazebo) clock if true'
     )
 
+    declare_port = DeclareLaunchArgument(
+        'port',
+        default_value='/dev/ttyACM0',
+        description='Serial port of the servo bus'
+    )
+
+    declare_use_mock_hardware = DeclareLaunchArgument(
+        'use_mock_hardware',
+        default_value='false',
+        description='Use mock_components/GenericSystem instead of the real servos'
+    )
+
     # Process the URDF
     robot_description_content = ParameterValue(
         Command([
             FindExecutable(name='xacro'), ' ',
-            urdf_file
+            urdf_file,
+            ' port:=', port,
+            ' use_mock_hardware:=', use_mock_hardware,
         ]),
         value_type=str
     )
@@ -70,7 +85,6 @@ def generate_launch_description():
     )
 
     # Omni Drive Controller Spawner
-    # Wait for joint_state_broadcaster to start before spawning omni_drive_controller
     omni_drive_controller_spawner = Node(
         package='controller_manager',
         executable='spawner',
@@ -88,6 +102,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         declare_use_sim_time,
+        declare_port,
+        declare_use_mock_hardware,
         robot_state_publisher_node,
         controller_manager_node,
         joint_state_broadcaster_spawner,

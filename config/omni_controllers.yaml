@@ -57,16 +57,9 @@ omni_wheel_drive_controller:
     publish_rate: 50.0
     enable_odom_tf: true
     odom_frame_id: odom
-    base_frame_id: base_link
+    base_frame_id: base_footprint  # URDF root; base_link already has base_footprint as its parent
 
     # Odometry configuration
     open_loop: false
     position_feedback: true
     velocity_rolling_window_size: 10
-
-joint_state_broadcaster:
-  ros__parameters:
-    joints:
-      - left_wheel_joint
-      - rear_wheel_joint
-      - right_wheel_joint

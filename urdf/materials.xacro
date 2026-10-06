@@ -1,35 +1,35 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <material name="black">
+  <material name="lekiwi_black">
     <color rgba="0.1 0.1 0.1 1.0"/>
   </material>
 
-  <material name="white">
+  <material name="lekiwi_white">
     <color rgba="0.9 0.9 0.9 1.0"/>
   </material>
 
-  <material name="gray">
+  <material name="lekiwi_gray">
     <color rgba="0.5 0.5 0.5 1.0"/>
   </material>
 
-  <material name="red">
+  <material name="lekiwi_red">
     <color rgba="0.8 0.0 0.0 1.0"/>
   </material>
 
-  <material name="green">
+  <material name="lekiwi_green">
     <color rgba="0.0 0.8 0.0 1.0"/>
   </material>
 
-  <material name="blue">
+  <material name="lekiwi_blue">
     <color rgba="0.0 0.0 0.8 1.0"/>
   </material>
 
-  <material name="navy_blue">
+  <material name="lekiwi_navy_blue">
     <color rgba="0.0 0.0 0.5 1.0"/>
   </material>
 
-  <material name="yellow">
+  <material name="lekiwi_yellow">
     <color rgba="0.8 0.8 0.0 1.0"/>
   </material>
 

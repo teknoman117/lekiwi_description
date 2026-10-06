@@ -13,7 +13,7 @@ def generate_launch_description():
     pkg_lekiwi_description = get_package_share_directory('lekiwi_description')
 
     # Path to URDF file
-    urdf_file = os.path.join(pkg_lekiwi_description, 'urdf', 'lekiwi.urdf.xacro')
+    urdf_file = os.path.join(pkg_lekiwi_description, 'urdf', 'lekiwi_base.urdf.xacro')
 
     # Launch argument for simulation time
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
@@ -36,11 +36,8 @@ def generate_launch_description():
         }]
     )
 
-    # Publish Zero Joints Node - publishes zero joint states for visualization
-    publish_zero_joints_node = Node(
-        #package='lekiwi_description',
-        #executable='publish_zero_joints.py',
-        #name='publish_zero_joints',
+    # Joint State Publisher GUI - publishes joint states for visualization
+    joint_state_publisher_gui_node = Node(
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui',
         name='joint_state_publisher_gui',
@@ -57,5 +54,5 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'
         ),
         robot_state_publisher_node,
-        publish_zero_joints_node,
+        joint_state_publisher_gui_node,
     ])
