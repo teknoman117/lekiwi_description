@@ -107,10 +107,10 @@
         </geometry>
       </collision>
 
-      <inertial>
+      <!--<inertial>
         <origin xyz="0 0.003 0" rpy="${-PI/2} 0 0"/>
         <mass value="0.154"/>
-      </inertial>
+      </inertial>-->
     </link>
 
     <joint name="${prefix}_wheel_joint" type="continuous">

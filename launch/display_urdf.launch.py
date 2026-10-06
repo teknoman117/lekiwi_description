@@ -38,9 +38,12 @@ def generate_launch_description():
 
     # Publish Zero Joints Node - publishes zero joint states for visualization
     publish_zero_joints_node = Node(
-        package='lekiwi_description',
-        executable='publish_zero_joints.py',
-        name='publish_zero_joints',
+        #package='lekiwi_description',
+        #executable='publish_zero_joints.py',
+        #name='publish_zero_joints',
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
+        name='joint_state_publisher_gui',
         output='screen',
         parameters=[{
             'use_sim_time': use_sim_time,
