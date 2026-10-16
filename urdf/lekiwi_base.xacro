@@ -103,7 +103,7 @@
 
   <!-- The base. arm_mount is an empty frame on top of the upper plate where a manipulator
        attaches; arm_mount_xyz/rpy are relative to upper_plate_link (center of its top surface). -->
-  <xacro:macro name="lekiwi_base" params="prefix:='' arm_mount_xyz:='0.02 0 0' arm_mount_rpy:='0 0 0'">
+  <xacro:macro name="lekiwi_base" params="prefix:='' arm_mount_xyz:='0.03 0 0' arm_mount_rpy:='0 0 0'">
 
     <!-- Base Link: Bottom plate of the LeKiwi. Origin is the center of the top surface -->
     <link name="${prefix}base_link">
