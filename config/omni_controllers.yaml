@@ -18,43 +18,24 @@ omni_wheel_drive_controller:
       - rear_wheel_joint
       - right_wheel_joint
 
-    # Robot geometry (in meters and radians)
-    wheel_radius: 0.054  # 54mm radius (108mm diameter)
-    wheel_base_radius: 0.1305  # (108mm + 45mm/2) = 130.5 mm from center to wheel center
+    # Robot geometry (in meters and radians). The Jazzy controller reads only these three; the
+    # wheels are evenly spaced, starting at wheel_offset, in wheel_names order.
+    # Effective rolling radius, from a measured drive: odometry said 0.584 m for a real 0.56 m
+    # with 0.054 (the wheels' 108mm nominal diameter; the URDF keeps that for the model)
+    wheel_radius: 0.0518
+    wheel_offset: 1.0471975512  # 60 degrees (left); rear at 180, right at -60
+    # Effective radius, from a measured spin (with wheel_radius 0.0518): odometry said 1085 deg
+    # for a real ~1157 deg with 0.1305, the geometric (108mm + 45mm/2) center to wheel center
+    robot_radius: 0.1223
 
-    wheel_offset: 1.0471975512
-    robot_radius: 0.1305
+    # No velocity or acceleration limits here: the controller has none. Nav2's
+    # velocity_smoother (manipulator/config/nav2_params.yaml) and joy_teleop's scales limit them.
 
-    # Wheel angles relative to +X axis (in radians)
-    wheel_angles:
-      - 1.0472  # 60 degrees (left)
-      - 3.14159 # 180 degrees (rear)
-      - -1.0472 # -60 degrees (right)
-
-    # Command and state interfaces
-    command_interfaces:
-      - velocity
-
-    state_interfaces:
-      - position
-      - velocity
-
-    # Velocity limits (m/s and rad/s)
-    linear:
-      x:
-        max_velocity: 0.5
-        max_acceleration: 1.0
-      y:
-        max_velocity: 0.5
-        max_acceleration: 1.0
-
-    angular:
-      z:
-        max_velocity: 1.0
-        max_acceleration: 2.0
+    # Stop the wheels when no command has arrived for this long (seconds). This also covers a
+    # crashed teleop or Nav2, but not the servo driver itself (waveshare_servos/docs/operation.md).
+    cmd_vel_timeout: 0.5
 
     # Publishing options
-    publish_rate: 50.0
     enable_odom_tf: true
     odom_frame_id: odom
     base_frame_id: base_footprint  # URDF root; base_link already has base_footprint as its parent
@@ -62,4 +43,8 @@ omni_wheel_drive_controller:
     # Odometry configuration
     open_loop: false
     position_feedback: true
-    velocity_rolling_window_size: 10
+    # Covariances for slam_toolbox / Nav2 (x, y, z, roll, pitch, yaw); z and the tilts do not
+    # apply to a planar base. Tune from the odometry checks (manipulator/README.md, Navigation).
+    diagonal_covariance:
+      pose: [0.01, 0.01, 1000000.0, 1000000.0, 1000000.0, 0.03]
+      twist: [0.01, 0.01, 1000000.0, 1000000.0, 1000000.0, 0.03]

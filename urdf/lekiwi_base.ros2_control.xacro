@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- One velocity-mode wheel servo -->
+  <!-- One velocity-mode wheel servo. inverted: the servos' positive direction is the opposite of
+       the joint axis the omni controller expects (a +angular.z command turned the base clockwise);
+       it flips the commands and the states together. -->
   <xacro:macro name="lekiwi_wheel_ros2_joint" params="name id">
     <joint name="${name}">
       <param name="id">${id}</param>
       <param name="type">vel</param>
+      <param name="inverted">true</param>
       <param name="max_speed">9.2</param>
       <command_interface name="velocity">
         <param name="min">-9.2</param>
